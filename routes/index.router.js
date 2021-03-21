@@ -2,8 +2,47 @@
 const express = require("express");
 const auth = require("../middlewares/auth");
 const Blog = require("../models/Blog.model");
-
+const cookieSession = require('cookie-session');
 const router = express.Router();
+const passport = require('passport');
+require("/home/krishnaraj/Desktop/GSSOC Projects/BlogSite/routes/passport.js");
+
+
+
+//Configure Session Storage
+router.use(cookieSession({
+  name: 'session-name',
+  keys: ['key1', 'key2']
+}))
+
+//Configure Passport
+router.use(passport.initialize());
+router.use(passport.session());
+
+router.get("/failed" , (req,res) => {
+  res.send('<h1>Log in failed </h1>');
+} )
+
+const checkLog = (req,res,next) => {
+ return req.user ? next() : res.sendStatus(401);
+}
+
+router.get('/Profile ' , checkLog ,(req,res) => {
+  res.send(`<h1>${req.user.displayName}'s Profile Page</h1>`);
+} )
+
+router.get('/auth/google' , passport.authenticate('google' , { scope : ['profile ' , 'email' ] }) )
+router.get('/auth/google/callback' , passport.authenticate('google' , {failureRedirect: '/failed'}) , 
+function(req, res) {
+  res.render('/', {isAuthenticated: true, } );
+  }
+);
+
+router.get('/logout' , (req,res) => {
+  req.session = null ,
+  req.logout(),
+  res.render('/', {isAuthenticated: false });
+})
 
 //Default Texts-
 const homeStartingContent =
