@@ -31,12 +31,23 @@ const checkUserLoggedIn = (req, res, next) => {
   req.user ? next(): null;
 }
 
-
+//Protected Route.
 router.get('/profile', checkUserLoggedIn, (req, res) => {
-  res.redirect('/');
+ 
+  let user = {
+    displayName: req.user.displayName,
+    name: req.user.name.givenName,
+    email: req.user._json.email,
+    provider: req.user.provider }
 
-   // res.send(`<h1>${req.user.displayName} - ${user.name}'s Profile Page</h1>`)
-   
+    let token = jwt.sign({ email :req.user._json.email  }, process.env.SECRET_KEY );
+       
+    res.cookie('jwt', token);
+    res.redirect('/');
+
+  
+  // res.send(`<h1>${req.user.displayName} - ${user.name}'s Profile Page</h1>`)
+  
 });
 
 // Auth Routes
