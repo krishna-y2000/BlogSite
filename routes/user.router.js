@@ -6,6 +6,65 @@ const jwt = require("jsonwebtoken");
 const auth = require("../middlewares/auth");
 
 const router = express.Router();
+const passport = require('passport');
+const cookieSession = require('cookie-session');
+require('./passport');
+
+
+//Configure Session Storage
+router.use(cookieSession({
+  name: 'session-name',
+  keys: ['key1', 'key2']
+}))
+
+//Configure Passport
+router.use(passport.initialize());
+router.use(passport.session());
+
+
+router.get('/failed', (req, res) => {
+  res.send('<h1>Log in Failed :(</h1>')
+});
+
+// Middleware - Check user is Logged in
+const checkUserLoggedIn = (req, res, next) => {
+  req.user ? next(): null;
+}
+
+//Protected Route.
+router.get('/profile', checkUserLoggedIn, (req, res) => {
+ 
+  let user = {
+    displayName: req.user.displayName,
+    name: req.user.name.givenName,
+    email: req.user._json.email,
+    provider: req.user.provider }
+
+    let token = jwt.sign({ email :req.user._json.email  }, process.env.SECRET_KEY );
+       
+    res.cookie('jwt', token);
+    res.redirect('/');
+
+  
+  // res.send(`<h1>${req.user.displayName} - ${user.name}'s Profile Page</h1>`)
+  
+});
+
+// Auth Routes
+router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/failed' }),
+  function(req, res) {
+    res.redirect('/Profile' ) ;
+  }
+);
+
+//Logout
+router.get('/logout', (req, res) => {
+    req.session = null;
+    req.logout();
+    res.redirect('/');
+})
 
 //GET request for Sign Up
 router.get("/sign-up", auth, (req, res) => {
