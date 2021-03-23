@@ -32,30 +32,33 @@ const checkUserLoggedIn = (req, res, next) => {
 }
 
 //Protected Route.
-router.get('/profile', checkUserLoggedIn, (req, res) => {
+// router.get('/profile', checkUserLoggedIn, (req, res) => {
  
-  let user = {
-    displayName: req.user.displayName,
-    name: req.user.name.givenName,
-    email: req.user._json.email,
-    provider: req.user.provider }
+//   let user = {
+//     displayName: req.user.displayName,
+//     name: req.user.name.givenName,
+//     email: req.user._json.email,
+//     provider: req.user.provider }
 
-    let token = jwt.sign({ email :req.user._json.email  }, process.env.SECRET_KEY );
+    
        
-    res.cookie('jwt', token);
-    res.redirect('/');
+   
+//    // res.redirect('/');
 
   
-  // res.send(`<h1>${req.user.displayName} - ${user.name}'s Profile Page</h1>`)
+//   // res.send(`<h1>${req.user.displayName} - ${user.name}'s Profile Page</h1>`)
   
-});
+// });
+
 
 // Auth Routes
 router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/failed' }),
+router.get('/auth/google/callback', passport.authenticate('google' ,  { failureRedirect: '/failed' }),checkUserLoggedIn ,
   function(req, res) {
-    res.redirect('/Profile' ) ;
+    let token = jwt.sign({ email :req.user._json.email  }, process.env.SECRET_KEY );
+    res.cookie('jwt', token , {httpOnly : true });
+    res.redirect('/' ) ;
   }
 );
 
