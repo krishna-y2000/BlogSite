@@ -1,13 +1,15 @@
 require('dotenv').config({ path: "/home/krishnaraj/Desktop/GSSOC Projects/BlogSite/.env" });
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
-
+const User = require("../models/User.model");
 passport.serializeUser(function(user, done) {
-    done(null , user);
+    done(null , user.id);
 } );
 
-passport.deserializeUser(function(user, done) {
-    done(null, user);
+passport.deserializeUser(function(id, done) {
+    User.findById(id).then(user => {
+        done(null, user);
+      });
 });
 
 passport.use(new GoogleStrategy({
@@ -16,6 +18,24 @@ passport.use(new GoogleStrategy({
     callbackURL: process.env.CALLBACK_URL
 } ,
 function(accessToken, refreshToken, profile, cb) {
-    return cb(null, profile);
+    User.findOne({ googleId: profile.id }, (err, user) => {
+        if (err) {
+          return cb(err, false);
+        }
+        if (!err && user !== null) {
+          console.log('existing user');
+          return cb(null, user);
+        } else {
+          user = new User({ firstName: profile.displayName });
+          user.googleId = profile.id;
+          user.email = profile._json.email ;
+          
+          console.log('new user');
+          user.save((err, user) => {
+            if (err) return cb(err, false);
+            else return cb(null, user);
+          });
+        }
+      });
   } ) 
 );

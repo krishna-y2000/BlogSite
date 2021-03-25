@@ -8,12 +8,13 @@ const auth = require("../middlewares/auth");
 const router = express.Router();
 const passport = require('passport');
 const cookieSession = require('cookie-session');
+const { session } = require("passport");
 require('./passport');
 
 
 //Configure Session Storage
 router.use(cookieSession({
-  name: 'session-name',
+  name: 'mysession',
   keys: ['key1', 'key2']
 }))
 
@@ -54,20 +55,49 @@ const checkUserLoggedIn = (req, res, next) => {
 // Auth Routes
 router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
-router.get('/auth/google/callback', passport.authenticate('google' ,  { failureRedirect: '/failed' }),checkUserLoggedIn ,
+router.get('/auth/google/callback', passport.authenticate('google' ,  { failureRedirect: '/failed' }),
   function(req, res) {
-    let token = jwt.sign({ email :req.user._json.email  }, process.env.SECRET_KEY );
-    res.cookie('jwt', token , {httpOnly : true });
+    if (req.user) {
+      const payload = {
+        user: req.user._id,
+      };
+      let token = jwt.sign(payload, process.env.SECRET_KEY );
+    res.cookie('token', token );
     res.redirect('/' ) ;
-  }
+    }
+       
+    //   jwt.sign(
+    //     payload,
+    //     process.env.SECRET_KEY ,
+    //     (err, token) => {
+    //       if (err) return err;
+    //       else res.cookie('token', token , {httpOnly : true });
+    //     }
+    //   );
+    // }
+    // res.redirect('/');
+   
+  //}
+    }
 );
 
 //Logout
-router.get('/logout', (req, res) => {
-    req.session = null;
+router.get('/logout',auth , (req, res) => {
+    //req.session = null;
+    //session.clear();
+    //res.cookie('token', req.cookies.token ,{maxAge : 0} );
+  //  res.clearCookie("mysession");
+  //  res.clearCookie("token");
+  //  res.clearCookie("mysession.sig");
+
+  //req.session.destroy();
+  delete req.session.mysession;
+  res.clearCookie("token");
     req.logout();
     res.redirect('/');
 })
+
+
 
 //GET request for Sign Up
 router.get("/sign-up", auth, (req, res) => {
@@ -240,7 +270,7 @@ router.post("/sign-up", (req, res) => {
 });
 
 //POST request for log in
-router.post("/log-in", (req, res) => {
+router.post("/log-in", async (req, res) => {
   const { userName, password } = req.body;
 
   if (!userName || !password) {
@@ -252,7 +282,7 @@ router.post("/log-in", (req, res) => {
       },
     });
   }
-
+  
   User.findOne({ userName }, (err, doc) => {
     if (err || !doc) {
       return res.status(401).render("logIn", {
@@ -274,15 +304,17 @@ router.post("/log-in", (req, res) => {
           },
         });
       }
-
+      const payload = {
+            user: {
+              id: doc.id,
+            },
+          };
       const token = jwt.sign(
-        { _id: doc._id, userName },
+        payload,
         process.env.SECRET_KEY
       );
 
-      res.cookie("token", token, {
-        httpOnly: true,
-      });
+      res.cookie("token", token);
 
       res.redirect("/");
     });
@@ -291,7 +323,10 @@ router.post("/log-in", (req, res) => {
 
 // Post route for log-out
 router.post("/log-out", auth, (req, res) => {
+  if(req.session.mysession)
+  {delete req.session.mysession;}
   res.clearCookie("token");
+  req.logout();
   res.redirect("/");
 });
 

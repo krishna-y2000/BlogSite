@@ -6,27 +6,25 @@ const UserSchema = new Schema({
     type: String,
     required: true,
   },
-  lastName: {
-    type: String,
-    required: true,
-  },
+ 
+  googleId: String,
   userName: {
     type: String,
     unique: true,
-    required: true,
+    //required: true,
   },
   email: {
     type: String,
     unique: true,
-    required: true,
+   // required: true,
   },
   password: {
     type: String,
-    required: true,
+   // required: true,
   },
   confirmPassword: {
     type: String,
-    required: true,
+   // required: true,
   },
 });
 
