@@ -1,4 +1,4 @@
-require('dotenv').config({ path: "/home/krishnaraj/Desktop/GSSOC Projects/BlogSite/.env" });
+require('dotenv').config({ path: "../.env" });
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const User = require("../models/User.model");
@@ -18,7 +18,7 @@ passport.use(new GoogleStrategy({
     callbackURL: process.env.CALLBACK_URL
 } ,
 function(accessToken, refreshToken, profile, cb) {
-    User.findOne({ googleId: profile.id }, (err, user) => {
+    User.findOne({ email: profile._json.email }, (err, user) => {
         if (err) {
           return cb(err, false);
         }

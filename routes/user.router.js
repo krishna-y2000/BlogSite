@@ -32,25 +32,6 @@ const checkUserLoggedIn = (req, res, next) => {
   req.user ? next(): null;
 }
 
-//Protected Route.
-// router.get('/profile', checkUserLoggedIn, (req, res) => {
- 
-//   let user = {
-//     displayName: req.user.displayName,
-//     name: req.user.name.givenName,
-//     email: req.user._json.email,
-//     provider: req.user.provider }
-
-    
-       
-   
-//    // res.redirect('/');
-
-  
-//   // res.send(`<h1>${req.user.displayName} - ${user.name}'s Profile Page</h1>`)
-  
-// });
-
 
 // Auth Routes
 router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
@@ -66,36 +47,8 @@ router.get('/auth/google/callback', passport.authenticate('google' ,  { failureR
     res.redirect('/' ) ;
     }
        
-    //   jwt.sign(
-    //     payload,
-    //     process.env.SECRET_KEY ,
-    //     (err, token) => {
-    //       if (err) return err;
-    //       else res.cookie('token', token , {httpOnly : true });
-    //     }
-    //   );
-    // }
-    // res.redirect('/');
-   
-  //}
     }
 );
-
-//Logout
-router.get('/logout',auth , (req, res) => {
-    //req.session = null;
-    //session.clear();
-    //res.cookie('token', req.cookies.token ,{maxAge : 0} );
-  //  res.clearCookie("mysession");
-  //  res.clearCookie("token");
-  //  res.clearCookie("mysession.sig");
-
-  //req.session.destroy();
-  delete req.session.mysession;
-  res.clearCookie("token");
-    req.logout();
-    res.redirect('/');
-})
 
 
 
