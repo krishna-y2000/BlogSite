@@ -273,17 +273,14 @@ router.post("/log-in", (req, res) => {
           },
         });
       }
-      const payload = {
-            user: {
-              id: doc.id,
-            },
-          };
       const token = jwt.sign(
         { _id: doc._id, email },
         process.env.SECRET_KEY
       );
 
-      res.cookie("token", token);
+      res.cookie("token", token, {
+        httpOnly: true,
+      });
 
       res.redirect("/");
     });

@@ -106,8 +106,8 @@ router.post(
       const foundPost = await Blog.findOne({ _id: requestedPostId });
       foundPost.comments = foundPost.comments.sort((a, b) =>
         a.timestamps > b.timestamps ? -1 : a.timestamps < b.timestamps ? 1 : 0
-      ); 
-      foundPost.comments.splice(commentNum, 1); 
+      );
+      foundPost.comments.splice(commentNum, 1);
       await Blog.updateOne(
         { _id: requestedPostId },
         { comments: foundPost.comments },
