@@ -7,6 +7,52 @@ const auth = require("../middlewares/auth");
 const Blog = require("../models/Blog.model");
 
 const router = express.Router();
+const passport = require('passport');
+const cookieSession = require('cookie-session');
+const { session } = require("passport");
+require('./passport');
+
+
+//Configure Session Storage
+router.use(cookieSession({
+  name: 'mysession',
+  keys: ['key1', 'key2']
+}))
+
+//Configure Passport
+router.use(passport.initialize());
+router.use(passport.session());
+
+
+router.get('/failed', (req, res) => {
+  res.send('<h1>Log in Failed :(</h1>')
+});
+
+// Middleware - Check user is Logged in
+const checkUserLoggedIn = (req, res, next) => {
+  req.user ? next(): null;
+}
+
+
+// Auth Routes
+router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+router.get('/auth/google/callback', passport.authenticate('google' ,  { failureRedirect: '/failed' }),
+  function(req, res) {
+    if (req.user) {
+      const token = jwt.sign({ _id: req.user._id }, process.env.SECRET_KEY);
+      
+      //Send back the token to the user as a httpOnly cookie
+      res.cookie("token", token, {
+        httpOnly: true,
+      });
+    res.redirect('/' ) ;
+    }
+       
+    }
+);
+
+
 
 //GET request for Sign Up
 router.get("/sign-up", auth, (req, res) => {
@@ -286,8 +332,11 @@ router.post("/log-in", (req, res) => {
 
 // Post route for log-out
 router.post("/log-out", auth, (req, res) => {
+  if(req.session.mysession)
+  {delete req.session.mysession;}
   res.clearCookie("token");
-  res.redirect("/");
+  req.logout();
+  return res.redirect("/");
 });
 
 //*route    /author/:id

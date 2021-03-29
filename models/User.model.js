@@ -5,16 +5,15 @@ const Schema = mongoose.Schema;
 const UserSchema = new Schema({
   firstName: {
     type: String,
-    required: true,
+    required : true 
   },
   lastName: {
     type: String,
-    required: true,
+   
   },
   userName: {
     type: String,
     unique: true,
-    required: true,
   },
   email: {
     type: String,
@@ -23,11 +22,9 @@ const UserSchema = new Schema({
   },
   password: {
     type: String,
-    required: true,
   },
   confirmPassword: {
     type: String,
-    required: true,
   },
 });
 // hash the password if it is modified

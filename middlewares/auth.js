@@ -3,14 +3,21 @@ const User = require("../models/User.model");
 
 module.exports = (req, res, next) => {
   const token = req.cookies.token;
-
   // Check if there is a token
+
   if (!token) {
     return next();
   }
 
   //Check if it is valid
   jwt.verify(token, process.env.SECRET_KEY, (err, payload) => {
+    // if (err || !payload) {
+    //   return next();
+    // }
+    // console.log(payload.user);
+    // req.user = payload.user;
+
+    //   next();
     if (err || !payload) {
       return next();
     }
@@ -19,17 +26,17 @@ module.exports = (req, res, next) => {
       if (err) {
         return res.status(422).json("Oops! something went wrong!");
       }
-
+      console.log(user);
       if (!user) {
         return next();
       }
 
       req.user = {
         _id: user._id,
-        name: user.userName,
       };
 
       next();
     });
+   
   });
 };
