@@ -11,13 +11,7 @@ module.exports = (req, res, next) => {
 
   //Check if it is valid
   jwt.verify(token, process.env.SECRET_KEY, (err, payload) => {
-    // if (err || !payload) {
-    //   return next();
-    // }
-    // console.log(payload.user);
-    // req.user = payload.user;
-
-    //   next();
+  
     if (err || !payload) {
       return next();
     }
