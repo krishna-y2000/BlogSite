@@ -32,23 +32,34 @@
                         <input class="form-control col-md-12 col-sm-12 col-xs-12" type="email" name="email"
                             autocomplete="off" value="<%= data.email %>" required></input>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" >
                         <label class="sign-up-place">Password</label>
-                        <input class="form-control col-md-12 col-sm-12 col-xs-12" type="password" name="password"
+                        <input class="form-control col-md-12 col-sm-12 col-xs-12" id="password" type="password" name="password"
                             autocomplete="off" value="<%= data.password %>" required></input>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" >
                         <label class="sign-up-place">Confirm Password</label>
-                        <input class="form-control col-md-12 col-sm-12 col-xs-12" type="password" name="confirmPassword"
+                        <input class="form-control col-md-12 col-sm-12 col-xs-12"type = "password"  id = "confirmPassword" name="confirmPassword"
                             autocomplete="off" value="<%= data.confirmPassword %>" required></input>
                     </div>
+                    <div class="registrationFormAlert" style="color:red;" id="CheckPasswordMatch"></div>
                     <div class="text-center">
                         Already a User? <a href="/log-in">Log In</a>
                     </div>
-                    <button class="btn btn-primary log-in-btn" type="submit" name="sign-up">Sign Up</button>
+                    <button class="btn btn-primary log-in-btn" type="submit" name="sign-up">Sign Up</button>          
                 </form>
             </div>
 
     </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>   
+    <script>
+            $('#password, #confirmPassword').on('keyup', function () {
+        if ($('#password').val() == $('#confirmPassword').val()) {
+            $('#CheckPasswordMatch').html('Password matches').css('color', 'green');
+        }
+         else 
+            $('#CheckPasswordMatch').html('Password does not matches!!').css('color', 'red');
+        });
+   </script>
 
 <%- include("partials/footer") -%>

@@ -25,10 +25,6 @@ const UserSchema = new Schema({
     type: String,
     required: true,
   },
-  confirmPassword: {
-    type: String,
-    required: true,
-  },
 });
 // hash the password if it is modified
 UserSchema.pre('save', async function (next) {
