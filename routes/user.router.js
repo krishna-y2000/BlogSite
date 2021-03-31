@@ -159,19 +159,6 @@ router.post("/sign-up", (req, res) => {
     });
   }
 
-  if (password !== confirmPassword) {
-    return res.status(500).render("signUp", {
-      error: "Password does not match",
-      data: {
-        firstName,
-        lastName,
-        userName,
-        email,
-        password,
-        confirmPassword,
-      },
-    });
-  }
   // Check if the username or email already taken
   User.findOne({ $or: [{ email }, { userName }] }, (err, doc) => {
     if (doc) {
